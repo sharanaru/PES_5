@@ -33,6 +33,7 @@
  * @brief   Application entry point.
  */
 #include "uarts.h"
+#include "ctype.h"
 uint8_t txinterrupt;
 enum Error_status result;
 bool UART0_Transmit_Poll() {
@@ -182,8 +183,7 @@ void UART0_IRQHandler(void) {
 		ch = UART0->D;received=true;
 
 
-		//		if (!Q_Full(&RxQ)) {
-		//			Q_Enqueue(&RxQ, ch);
+
 	}
 
 
@@ -217,6 +217,7 @@ char received_char()
 {
 
 	return ch;
+
 }
 void Send_Char(char k)
 {
@@ -235,22 +236,7 @@ void receivewritetobuffer(user_n *user_t,uint16_t size,uint8_t l)
 
 		buffer_write(user_t,received_char(), size);
 		received=false;
-		if(user_t->full)
-		{
-			//Send_String("Limit reached \n\r");
-			for(int hg=1;hg<=l;hg++)
-			{	//printf("%d\n",i);
-				Send_Char(buffer_read(user_t));
-				volatile uint64_t i=0;
-				while(i!=3900) //holds execution till delay is achieved
-				{ __asm("NOP");
-				i++;
-				}
 
-			}
-		buffer_reset(user_t);
-
-		}
 
 	}
 }

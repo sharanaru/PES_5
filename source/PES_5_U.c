@@ -41,7 +41,7 @@
 //#include "buffer_functions.h"
 #include "uarts.h"
 #include "MKL25Z4.h"
-#define serialstringprint(x) Send_String(char * str)
+#define serialstringprint(x) Send_String(x)
 //#include "fsl_debug_console.h"
 
 /* TODO: insert other include files here. */
@@ -53,30 +53,35 @@
  *
 
  */
-uint8_t characters[95]={0);
-void character_count(uint16_t bufferlength,user_n *user_t)
+uint8_t characters[95]={0};
+void character_counter(uint16_t bufferlength,user_n *user_t)//counts the characters in buffer
 {	uint8_t charvalue;
-	for(int i=0;i<bufferlength;i++)
-	{
+for(int i=0;i<bufferlength;i++)
+{
 
-		charvalue=buffer_read(user_t);
-		characters[charvalue-33]+=1;
-	}
+	charvalue=buffer_read(user_t);
+	characters[charvalue-32]+=1;
+}
 }
 
-void generate_charreport()
+void generate_charreport() //prints the character report by going through buffer
 {
-	serialstringprint;
-	char test[10];
+	serialstringprint("\n\r");
+
 	for(int i=0;i<95;i++)
 	{
 		if(characters[i]!=0)
-			test[10]
+		{
+			char test[40];
+			sprintf( test,"Character %c: %d times \0",i+32,characters[i]);
+			Send_String(test);characters[i]=0;
+
+		}
 	}
-
+	serialstringprint("\n\r");
 }
 
-}
+
 int main(void) {
 
 	/* Init board hardware. */
@@ -86,28 +91,40 @@ int main(void) {
 	/* Init FSL debug console. */
 	BOARD_InitDebugConsole();
 	uint16_t *buffer_t=NULL;
-//	enum Error_status result;
+	//	enum Error_status result;
 
 	user_n k = {NULL,NULL,NULL,0,0,0};
-	uint16_t space = 5; uint8_t l=5;
-printf("hello");
-create_buffer(buffer_t,&k, &space);
-uart_init(1);
-Send_String("heya\n\r");
-Send_String("hs\n\r");
+	user_n *t=&k;
+	uint16_t space = 100; uint8_t l=space;
+	printf("hello");
+	create_buffer(buffer_t,t, &space);
+	uart_init(1);
+	Send_String("heya\n\r");
+	Send_String("hs\n\r");
 
 
 
-while(1)
-{
+	while(1)
+	{
 
 
-	receivewritetobuffer(&k, space,l);
+		receivewritetobuffer(t, space,l);
+		if(k.full)
+		{
+			//Send_String("Limit reached \n\r");
+
+
+			character_counter(space,t);
+			generate_charreport();
+			buffer_reset(t);
+
+		}
 
 
 
-	//Send_String("Buffer full");
-}
+		//Send_String("Buffer full");
+	}
+
 
 
 
