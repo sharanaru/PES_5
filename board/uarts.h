@@ -1,8 +1,8 @@
 /*
- * uarts.h
+ * uarts.h - For both interrupt and polling driven UART
  *
  *  Created on: Nov 17, 2019
- *      Author: shara
+ *      Author: Sharan
  */
 
 //#ifndef UARTS_H_

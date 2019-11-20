@@ -2,7 +2,7 @@
  * buffer_functions.c
  *
  *  Created on: 11-Nov-2019
- *      Author: Hp
+ *      Author: Abhijeet
  */
 #include "buffer_functions.h"
 #include <stdint.h>

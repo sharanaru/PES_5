@@ -1,8 +1,8 @@
 /*
- * buffer_functions.h
+ * buffer_functions.h - To work with Cicrcular buffer
  *
  *  Created on: 11-Nov-2019
- *      Author: Hp
+ *      Author: Abhijeet and Sharan
  */
 
 #ifndef BUFFER_FUNCTIONS_H_
