@@ -7,6 +7,7 @@ C_SRCS += \
 ../board/board.c \
 ../board/buffer_functions.c \
 ../board/clock_config.c \
+../board/logger.c \
 ../board/peripherals.c \
 ../board/pin_mux.c \
 ../board/uarts.c 
@@ -15,6 +16,7 @@ OBJS += \
 ./board/board.o \
 ./board/buffer_functions.o \
 ./board/clock_config.o \
+./board/logger.o \
 ./board/peripherals.o \
 ./board/pin_mux.o \
 ./board/uarts.o 
@@ -23,6 +25,7 @@ C_DEPS += \
 ./board/board.d \
 ./board/buffer_functions.d \
 ./board/clock_config.d \
+./board/logger.d \
 ./board/peripherals.d \
 ./board/pin_mux.d \
 ./board/uarts.d 

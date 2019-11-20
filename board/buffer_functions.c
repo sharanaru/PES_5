@@ -4,7 +4,7 @@
  *  Created on: 11-Nov-2019
  *      Author: Hp
  */
-#include <buffer_functions.h>
+#include "buffer_functions.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -12,10 +12,10 @@
 uint8_t rw;
 //int result;
 //extern enum Error_status result;
-
+enum Error_status result;
 /* Function to create buffer */
 // Pass a storage buffer and size
-int create_buffer(uint16_t *buffer_t,user_n *user_t,uint16_t *size)
+enum Error_status create_buffer(uint16_t *buffer_t,user_n *user_t,uint16_t *size)
 {
 	if(*size>0)
 	{
@@ -50,7 +50,7 @@ int create_buffer(uint16_t *buffer_t,user_n *user_t,uint16_t *size)
 /* Reallocate Buffer */
 // Function called when original buffer becomes full
 
-int overflow_handler(uint16_t *buffer_rt,user_n *user_t,uint16_t size)
+enum Error_status overflow_handler(uint16_t *buffer_rt,user_n *user_t,uint16_t size)
 {
 	size = size + 10;
 	if(size>0)

@@ -7,7 +7,8 @@ source/PES_5_U.o source/PES_5_U.d: ../source/PES_5_U.c ../board/board.h \
  ../drivers/fsl_common.h ../drivers/fsl_gpio.h ../board/peripherals.h \
  ../board/pin_mux.h ../board/clock_config.h ../board/uarts.h \
  ../board/board.h ../board/peripherals.h ../board/pin_mux.h \
- ../CMSIS/MKL25Z4.h ../board/buffer_functions.h
+ ../CMSIS/MKL25Z4.h ../board/buffer_functions.h ../board/logger.h \
+ ../board/uarts.h
 
 ../board/board.h:
 
@@ -54,3 +55,7 @@ source/PES_5_U.o source/PES_5_U.d: ../source/PES_5_U.c ../board/board.h \
 ../CMSIS/MKL25Z4.h:
 
 ../board/buffer_functions.h:
+
+../board/logger.h:
+
+../board/uarts.h:

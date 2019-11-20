@@ -35,7 +35,7 @@
 #include "uarts.h"
 #include "ctype.h"
 uint8_t txinterrupt;
-enum Error_status result;
+
 bool UART0_Transmit_Poll() {
 	while(!(UART0->S1 & UART0_S1_TDRE_MASK))
 
@@ -55,7 +55,7 @@ bool UART0_Receive_Poll(void)
 		return false;
 }
 char serialreturner()
-{
+{ UART0->S1 |= UART0_S1_OR(1);
 	while(UART0_Receive_Poll())
 		;
 	return UART0->D;
@@ -125,8 +125,7 @@ void uart_init(uint8_t interrupt){
 	// Don't enable loopback mode, use 8 data bit mode, don't use parity
 	UART0->C1 = UART0_C1_LOOPS(0) | UART0_C1_M(0) | UART0_C1_PE(0);
 	// Don't invert transmit data, don't enable interrupts for errors
-	UART0->C3 = UART0_C3_TXINV(0) | UART0_C3_ORIE(0)| UART0_C3_NEIE(0)
-    																	| UART0_C3_FEIE(0) | UART0_C3_PEIE(0);
+	UART0->C3 = UART0_C3_TXINV(0) | UART0_C3_ORIE(0)| UART0_C3_NEIE(0)| UART0_C3_FEIE(0) | UART0_C3_PEIE(0);
 
 	// Clear error flags
 	UART0->S1 = UART0_S1_OR(1) | UART0_S1_NF(1) | UART0_S1_FE(1) | UART0_S1_PF(1);
@@ -240,16 +239,22 @@ void receivewritetobuffer(user_n *user_t,uint16_t size,uint8_t l)
 
 	}
 }
+void poll_receivewritetobuffer(user_n *user_t,uint16_t size)
+{
+	uint8_t writed=serialreturner();
+	buffer_write(user_t, writed, size);
+}
 void Send_String(char *str) {
 	// enqueue string
 	while (*str != '\0') { // copy characters up to null terminator
 
 		if(txinterruptcheck())
-		{ begincritical();
-		UART0->D = *str;
-		str++;
-		endcritical();
-		//UART0->C2 |= UART0_C2_TIE(1);
+		{
+			begincritical();
+			UART0->D = *str;
+			str++;
+			endcritical();
+			//UART0->C2 |= UART0_C2_TIE(1);
 		}
 	}
 }

@@ -19,11 +19,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "buffer_functions.h"
+
 #define UART_OVERSAMPLE_RATE 	(16)
 #define BUS_CLOCK 						(24e6)
 #define SYS_CLOCK							(48e6)
-extern user_n k;
-
+//extern user_n k;
+//extern enum Error_status result;
 /*
  * @brief   Application entry point.
  */
@@ -39,8 +40,8 @@ void Send_String_Poll(char *s);
 char received_char();
 void Send_Char(char k);
 bool interrruptcheck();
+void poll_receivewritetobuffer(user_n *user_t,uint16_t size);
 void echo();
-//void receivewritetobuffer();
 void receivewritetobuffer(user_n *user_t, uint16_t size,uint8_t l);
 
 

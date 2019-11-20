@@ -34,14 +34,29 @@
  */
 #include <stdio.h>
 #include "board.h"
+#define NORMAL
+#define echoapp
+#define interrupt
 #include <stdbool.h>
 #include "peripherals.h"
 #include "pin_mux.h"
 #include "clock_config.h"
+
 //#include "buffer_functions.h"
 #include "uarts.h"
 #include "MKL25Z4.h"
+
+#ifdef interrupt
 #define serialstringprint(x) Send_String(x)
+#define uartinit() uart_init(1)
+#endif
+#ifdef poll
+#define serialstringprint(x) Send_String_Poll(x)
+#define Send_String(x) Send_String_Poll(x)
+#define uartinit() uart_init(0)
+#endif
+#include "logger.h"
+//enum Error_status result;
 //#include "fsl_debug_console.h"
 
 /* TODO: insert other include files here. */
@@ -73,11 +88,13 @@ void generate_charreport() //prints the character report by going through buffer
 		if(characters[i]!=0)
 		{
 			char test[40];
-			sprintf( test,"Character %c: %d times \0",i+32,characters[i]);
-			Send_String(test);characters[i]=0;
+			sprintf( test," %c - %d;\0",i+32,characters[i]);
+			Send_String(test);
+			characters[i]=0;
 
 		}
 	}
+	log_time();
 	serialstringprint("\n\r");
 }
 
@@ -96,18 +113,20 @@ int main(void) {
 	user_n k = {NULL,NULL,NULL,0,0,0};
 	user_n *t=&k;
 	uint16_t space = 100; uint8_t l=space;
-	printf("hello");
+	//printf("hello");
 	create_buffer(buffer_t,t, &space);
-	uart_init(1);
-	Send_String("heya\n\r");
-	Send_String("hs\n\r");
+	Sys_Init();
+	uartinit();
+logmode();
+logapp();
 
 
 
 	while(1)
 	{
 
-
+#ifdef interrupt
+#ifdef app
 		receivewritetobuffer(t, space,l);
 		if(k.full)
 		{
@@ -123,9 +142,32 @@ int main(void) {
 
 
 		//Send_String("Buffer full");
+#endif
+#ifdef echoapp
+		echo();
+#endif
+#endif
+#ifdef poll
+#ifdef app
+		poll_receivewritetobuffer(t,space);
+		if(k.full)
+		{
+			//Send_String("Limit reached \n\r");
+
+
+			character_counter(space,t);
+			generate_charreport();
+			buffer_reset(t);
+
+		}
+#endif
+#ifdef echoapp
+
+		Send_Char_Poll(serialreturner());
+
+#endif
+#endif
 	}
-
-
 
 
 
