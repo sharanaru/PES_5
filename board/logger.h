@@ -1,3 +1,4 @@
+//Sharan Arumugam and Abhijeet- Generates logging messages and Timestamps using Systick
 #include "MKL25Z4.h"
 #include "peripherals.h"
 #include "pin_mux.h"
@@ -8,18 +9,18 @@
 #define serialstringprint(x) Send_String_Poll(x)
 #define logwrite(x) Send_String_Poll(x)
 #endif
-#ifdef interrupt
+#ifdef interrupt //to use string print functions of interrupt
 #define serialstringprint(x) Send_String(x)
 #define logwrite(x) Send_String(x)
 #endif
 
-#ifdef ddebug
+#ifdef ddebug //to display current function also
 #define logfunction() serialstringprint("Function running is ");serialstringprint(__func__);serialstringprint("\n\r")
 #define logmode() serialstringprint("Mode is Debug\n\r");
 #else
 #define logfunction()
 #endif
-
+//when debug messages arent required
 #ifdef NORMAL
 #define logmode() serialstringprint("Mode is Normal\n\r");
 #endif

@@ -49,45 +49,42 @@ bool UART0_Receive_Poll(void)
 {
 	if(!(UART0->S1 & UART0_S1_RDRF_MASK))
 
-		//return UART0->D;
-		return true;
+
+		return true; //checking if any value has been received and sending true if received
 	else
 		return false;
 }
 char serialreturner()
 { UART0->S1 |= UART0_S1_OR(1);
-	while(UART0_Receive_Poll())
-		;
-	return UART0->D;
+while(UART0_Receive_Poll())
+	;
+return UART0->D;
 
 
 }
 char stringsender(char k)
 {
-	//if (*k != '\0') { // Send characters up to null terminator
+
 
 	return k;
-	//UART0_Transmit_Poll(*str++);
+
 
 
 }
 void Send_Char_Poll(char k) {
-	// enqueue string
-	//	while (*str != '\0') { // Send characters up to null terminator
-	//
-	//		UART0_Transmit_Poll(*str++);
-	LED_PASS();delay();delay();
+
+	LED_PASS();delay();delay(); //led routines - shows green
 	while(UART0_Transmit_Poll()) //blocking here
 		;
 
-	//if((!UART0_Transmit_Poll()))
-	UART0->D=stringsender(k);
+
+	UART0->D=stringsender(k);//puts char value on to UART
 
 
 }
 void Send_String_Poll(char *s)
 {
-	while(*s !='\0')
+	while(*s !='\0') //USes terminating character to end tranmission of characters in input string
 		Send_Char_Poll(*s++);
 }
 
@@ -96,7 +93,7 @@ void uart_init(uint8_t interrupt){
 	/* Init board hardware. */
 
 	uint16_t sbr;
-	uint8_t temp;
+	uint8_t temp=0;
 
 	// Enable clock gating for UART0 and Port A
 	SIM->SCGC4 |= SIM_SCGC4_UART0_MASK;
@@ -114,7 +111,7 @@ void uart_init(uint8_t interrupt){
 	PORTA->PCR[2] = PORT_PCR_ISF_MASK | PORT_PCR_MUX(2); // Tx
 
 	// Set baud rate and oversampling ratio
-	sbr = (uint16_t)((SYS_CLOCK/2)/(115200 * UART_OVERSAMPLE_RATE));
+	sbr = (uint16_t)((SYS_CLOCK/2)/(115200 * UART_OVERSAMPLE_RATE)); //baud rate of 115200
 	UART0->BDH &= ~UART0_BDH_SBR_MASK;
 	UART0->BDH |= UART0_BDH_SBR(sbr>>8);
 	UART0->BDL = UART0_BDL_SBR(sbr);
@@ -138,12 +135,12 @@ void uart_init(uint8_t interrupt){
 	// Send LSB first, do not invert received data
 	UART0->S2 = UART0_S2_MSBF(0) | UART0_S2_RXINV(0);
 
-	if(interrupt)
+	if(interrupt) //enables interrupt based on input argument for init fucntion
 	{
 		// Enable interrupts. Listing 8.11 on p. 234
 
 
-		NVIC_SetPriority(UART0_IRQn, 2); // 0, 1, 2, or 3
+		NVIC_SetPriority(UART0_IRQn, 2); // Higher priority than Systick interrupt
 		NVIC_ClearPendingIRQ(UART0_IRQn);
 		NVIC_EnableIRQ(UART0_IRQn);
 
@@ -162,7 +159,8 @@ void uart_init(uint8_t interrupt){
 
 
 }
-uint8_t ch; bool received;
+uint8_t ch; //variable which stores received value from Rx interrupt
+bool received; //to see if rx has received char
 void UART0_IRQHandler(void) {
 
 
@@ -192,7 +190,7 @@ void UART0_IRQHandler(void) {
 		// can send another character
 
 		//UART0->D = ch;
-		txinterrupt=true;
+		txinterrupt=true;//sets if tx interrupt has been set to show tx buffer is empty
 		UART0->C2 &= ~UART0_C2_TIE_MASK;
 	}
 
@@ -203,29 +201,30 @@ void UART0_IRQHandler(void) {
 bool txinterruptcheck()
 {
 	UART0->C2 |= UART0_C2_TIE_MASK; //enabling tx interrupt here
-	while(!txinterrupt)
-		;
-	//if(txinterrupt)
-	//{
-	txinterrupt=false;UART0->C2 &= ~UART0_C2_TIE_MASK;
+//	while(!txinterrupt)
+//		;
+	if(txinterrupt)
+	{
+	txinterrupt=false; //clears self made tx flag
+	UART0->C2 &= ~UART0_C2_TIE_MASK;//clears mask
 	return true;
-	//}
-	//else
-	//return false;
+	}
+
+	return false;
 }
 char received_char()
 {
 
-	return ch;
+	return ch;//controls access to ch varialble which contains received character
 
 }
-void Send_Char(char k)
+void Send_Char(char k)//sends char value using interrupt
 {
 	if(txinterruptcheck())
 	{
-		begincritical();
-		UART0->D = k;
-		endcritical();
+		begincritical(); //critical section begins
+		UART0->D = k; //sends input char to UArt bus
+		endcritical(); //ends critical section
 	}
 
 }
@@ -234,16 +233,16 @@ void receivewritetobuffer(user_n *user_t,uint16_t size,uint8_t l)
 	if(received)
 	{
 
-		buffer_write(user_t,received_char(), size);
-		received=false;
+		buffer_write(user_t,received_char(), size);//calss buffer write function
+		received=false; //clears received flag
 
 
 	}
 }
 void poll_receivewritetobuffer(user_n *user_t,uint16_t size)
 {
-	uint8_t writed=serialreturner();
-	buffer_write(user_t, writed, size);
+	uint8_t writed=serialreturner();//captures received value
+	buffer_write(user_t, writed, size);//writes received value to buffer
 }
 void Send_String(char *str) {
 	// enqueue string
@@ -261,12 +260,14 @@ void Send_String(char *str) {
 }
 
 
-void echo()
+void echo() //to run echo using interrupt
 {
 	if(received)
-	{	LED_PASS();
-		Send_Char(received_char());
-		received=false;
+	{
+	LED_PASS();delay();
+	Send_Char(received_char());//sends received char back
+	received=false;
+
 	}
 }
 

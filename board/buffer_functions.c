@@ -10,8 +10,7 @@
 #include <stdbool.h>
 #include <fsl_debug_console.h>
 uint8_t rw;
-//int result;
-//extern enum Error_status result;
+
 enum Error_status result;
 /* Function to create buffer */
 // Pass a storage buffer and size
@@ -19,31 +18,27 @@ enum Error_status create_buffer(uint16_t *buffer_t,user_n *user_t,uint16_t *size
 {
 	if(*size>0)
 	{
-	buffer_t = (uint16_t *)malloc(*size*sizeof(uint8_t));
+		buffer_t = (uint16_t *)malloc(*size*sizeof(uint8_t));
 		if(buffer_t!=NULL)
-			{
-				result = SUCCESS;
-				user_t->buffer = buffer_t;
-				user_t->head = buffer_t;
-				user_t->tail = buffer_t;
-				user_t->maxlen = *size;
-//				PRINTF("\n\rmaxlen = %d\n\r",user_t->maxlen);
-//				PRINTF("user_t.head = %p\n\r",user_t->head);
-//				PRINTF("\n\rlast value = %p\n\r",(user_t->buffer + (user_t->maxlen-1)));
-			}
+		{
+			result = SUCCESS;
+			user_t->buffer = buffer_t;
+			user_t->head = buffer_t;
+			user_t->tail = buffer_t;
+			user_t->maxlen = *size;
+		}
 		else
-			{
-			//PRINTF("\n\rBUFFER NOT ALLOCATED\n\r");
+		{
+
 			result = FAILURE;
-			}
+		}
 	}
 	else
 	{
-		//PRINTF("\n\rEnter size greater than 0\n\r");
+
 		result = FAILURE;
 	}
-	//	user_t.maxlen = size;
-	//return (int)buffer_t;
+
 	return result;
 }
 
@@ -55,36 +50,34 @@ enum Error_status overflow_handler(uint16_t *buffer_rt,user_n *user_t,uint16_t s
 	size = size + 10;
 	if(size>0)
 	{
-	//uint16_t *buffer_rt = (uint16_t *)malloc(*size*sizeof(uint16_t));
-	buffer_rt = (uint16_t *)realloc(buffer_rt,(unsigned int)size*sizeof(uint8_t));
-	PRINTF("\n\rrealloc address = %p\n\r",buffer_rt);
-			//(user_t->buffer,*size*sizeof(uint16_t));
-		if(buffer_rt!=NULL)
-				{
-				result = SUCCESS;
-				user_t->buffer = buffer_rt;
-				// Head+last position
+		buffer_rt = (uint16_t *)realloc(buffer_rt,(unsigned int)size*sizeof(uint8_t));
+		PRINTF("\n\rrealloc address = %p\n\r",buffer_rt);
 
-				user_t->head = buffer_rt;
-				user_t->tail = buffer_rt;
-				user_t->maxlen = size;
-				PRINTF("\n\rmaxlen = %d\n\r",user_t->maxlen);
-				PRINTF("user_t.head = %p\n\r",user_t->head);
-				PRINTF("\n\rlast value = %p\n\r",(user_t->buffer + (user_t->maxlen-1)));
-			}
+		if(buffer_rt!=NULL) //checks if null
+		{
+			result = SUCCESS;
+			user_t->buffer = buffer_rt;
+			// Head+last position
+
+			user_t->head = buffer_rt;
+			user_t->tail = buffer_rt;
+			user_t->maxlen = size;
+			PRINTF("\n\rmaxlen = %d\n\r",user_t->maxlen);
+			PRINTF("user_t.head = %p\n\r",user_t->head);
+			PRINTF("\n\rlast value = %p\n\r",(user_t->buffer + (user_t->maxlen-1)));
+		}
 		else
-			{
-			PRINTF("\n\rBUFFER NOT REALLOCATED\n\r");
+		{
+
 			result = FAILURE;
-			}
+		}
 	}
 	else
 	{
 		PRINTF("\n\rEnter size greater than 0\n\r");
 		result = FAILURE;
 	}
-	//	user_t.maxlen = size;
-	//return (int)buffer_t;
+
 	return result;
 }
 
@@ -108,10 +101,7 @@ bool buffer_full(user_n *user_t)
 
 bool buffer_empty(user_n *user_t)
 {
-	//PRINTF("\n\rhead = %x\n\r",user_t->head);
-	//PRINTF("\n\rtail = %x\n\r",user_t->tail);
-	//PRINTF("\n\rfull = %d\n\r",user_t->full);
-	//PRINTF("\n\rEMPTY = %d\n\r",((!user_t->full) && (user_t->head==user_t->tail)));
+
 	return ((!user_t->full) && (user_t->head==user_t->tail));
 }
 
@@ -154,17 +144,17 @@ void advance_pointer(user_n *user_t)
 		}
 	}
 
-	//user_t->head = (user_t->head+1);
+
 	user_t->head++;
 	if(user_t->head == ((user_t->buffer+user_t->maxlen)))
 	{
-		//PRINTF("\n\rRollover head = %p\n\r",user_t->head);
+
 		user_t->head = user_t->buffer;
 	}
 
 
-			if(user_t->head==user_t->tail)
-				user_t->full=true;
+	if(user_t->head==user_t->tail)
+		user_t->full=true;
 }
 
 /* Retreat Pointer */
@@ -173,28 +163,12 @@ void retreat_pointer(user_n *user_t)
 {
 	user_t->full = false;
 	user_t->tail++;
-			if(user_t->tail == ((user_t->buffer+user_t->maxlen)))
-			{
-				user_t->tail = user_t->buffer;
-			}
+	if(user_t->tail == ((user_t->buffer+user_t->maxlen)))
+	{
+		user_t->tail = user_t->buffer;
+	}
 }
 
-/* Size function */
-// PASS HEAD and TAIL
-//int cbuf_size(user_n *user_t)
-//{
-//	if(user_t->head>=user_t->tail)
-//	{
-//
-//		user_t->count = user_t->head - user_t->tail;
-//	}
-//	else
-//	{
-//		user_t->count = ((user_t->maxlen + user_t->head)-user_t->tail);
-//	}
-//
-//	return user_t->count;
-//}
 
 int character_count(user_n *user_t)
 {
@@ -208,23 +182,20 @@ int character_count(user_n *user_t)
 	{
 		user_t->count--;
 	}
-	//PRINTF("\n\rcount = %d\n\r",user_t->count);
+
 	return user_t->count;
 }
 
 
 
 
-/* Read from buffer */
-// Increment tail while writing
 
 int buffer_read(user_n *user_t)
 {
 
 	uint8_t readdata = *(user_t->tail);
 	retreat_pointer(user_t);
-	//PRINTF("\n\rreaddata = %d, tail = %d\n\r",readdata,*(user_t->tail));
-	//PRINTF("\n\rREAD ADDRESS = %p\n\r",user_t->tail);
+
 	rw = 0;
 	character_count(user_t);
 	if(buffer_full(user_t))
@@ -246,29 +217,13 @@ int buffer_read(user_n *user_t)
 void buffer_write(user_n *user_t, uint8_t writedata, uint16_t size)
 {
 
-		buffer_full(user_t);
-		*(user_t->head) = writedata;
-	//	PRINTF("\n\r head = %d,write data = %d\n\r",*(user_t->head),writedata);
-		//PRINTF("\n\r head address = %p\n\r",user_t->head);
-		advance_pointer(user_t);
-		//cbuf_size(user_t);
-		rw = 1;
-		character_count(user_t);
-//		if(buffer_full(user_t))
-//			{
-//				//user_t->full = false;
-//				return;
-//
-//				// Reallocate function
-//				//overflow_handler(pointer,user_t,size);
-//				//buffer_destroy(user_t);
-//
-//
-//			}
-//		if(buffer_empty(user_t))
-//			{
-//				PRINTF("\n\rBUFFER IS EMPTY!\n\r");
-//			}
+	buffer_full(user_t);
+	*(user_t->head) = writedata;
+
+	advance_pointer(user_t);
+
+	rw = 1;
+	character_count(user_t);
 
 }
 
