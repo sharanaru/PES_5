@@ -41,17 +41,7 @@ void log_time(void)
 
 	minutes =seconds/60;
 	hours = minutes/60;
-
-
-	// USE YOUR UART FUNCTION FOR PRINTING
-	//  ("\n\r%d : %d: %d: %d",hours,minutes,seconds,ms);
-
-
-
-
-	// USE YOUR UART FUNCTION FOR PRINTING
 	char test[60];
-
 	sprintf(test,"\n\r%d : %d: %d.%d\0",hours,minutes,printseconds,ms);
 	Send_String_Poll(test);
 

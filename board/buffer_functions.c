@@ -136,7 +136,7 @@ void buffer_reset(user_n *user_t)
 // call free on the buffer address
 void buffer_destroy(user_n *user_t)
 {
-	free(user_t->buffer);
+	free(user_t->buffer); user_t->buffer=NULL;
 
 }
 
@@ -234,7 +234,7 @@ int buffer_read(user_n *user_t)
 	if(buffer_empty(user_t))
 	{
 
-		//PRINTF("\n\rBUFFER IS EMPTY!\n\r");
+		return FAILURE;
 	}
 	return readdata;
 }

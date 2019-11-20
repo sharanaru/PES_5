@@ -34,18 +34,21 @@
  */
 #include <stdio.h>
 #include "board.h"
-#define NORMAL
-#define echoapp
-#define interrupt
+#define poll
+#define app
 #include <stdbool.h>
 #include "peripherals.h"
 #include "pin_mux.h"
 #include "clock_config.h"
-
+#include "led_board.h"
 //#include "buffer_functions.h"
 #include "uarts.h"
 #include "MKL25Z4.h"
-
+#ifdef TEST
+#include "Testsuite.h"
+#include "uCUnit-v1.0.h"
+#include "System.h"
+#endif
 #ifdef interrupt
 #define serialstringprint(x) Send_String(x)
 #define uartinit() uart_init(1)
@@ -70,7 +73,8 @@
  */
 uint8_t characters[95]={0};
 void character_counter(uint16_t bufferlength,user_n *user_t)//counts the characters in buffer
-{	uint8_t charvalue;
+{	logfunction();
+	uint8_t charvalue;
 for(int i=0;i<bufferlength;i++)
 {
 
@@ -80,7 +84,7 @@ for(int i=0;i<bufferlength;i++)
 }
 
 void generate_charreport() //prints the character report by going through buffer
-{
+{	logfunction();
 	serialstringprint("\n\r");
 
 	for(int i=0;i<95;i++)
@@ -107,6 +111,8 @@ int main(void) {
 	BOARD_InitBootPeripherals();
 	/* Init FSL debug console. */
 	BOARD_InitDebugConsole();
+	LED_Initialise();
+
 	uint16_t *buffer_t=NULL;
 	//	enum Error_status result;
 
@@ -117,14 +123,48 @@ int main(void) {
 	create_buffer(buffer_t,t, &space);
 	Sys_Init();
 	uartinit();
+	LED_PROCESS();
 logmode();
 logapp();
+#ifdef TEST
 
+		user_n testinginstance = {NULL,NULL,NULL,0,0,0};
+			user_n *testptr=&testinginstance;
+			uint16_t testsize=3;
+			enum Error_status testresult;
+			UCUNIT_Init();
+			UCUNIT_TestcaseBegin("Project 5 testing begins");
+			testresult=create_buffer(buffer_t,testptr, &testsize);
+			UCUNIT_CheckIsEqual(SUCCESS,testresult);//checks if buffer creation was successfull;
+			buffer_write(testptr, 5, testsize);
+			int f=buffer_read(testptr);
+			UCUNIT_CheckIsEqual(5,f);//check if reading correctly
+			buffer_write(testptr,5,testsize);
+			buffer_write(testptr,6,testsize);
+			buffer_write(testptr,7,testsize);
+			if(testinginstance.full)
+				UCUNIT_WriteString("Buffer full");
+			int kt=buffer_read(testptr);
+			buffer_read(testptr);
+			buffer_read(testptr);
+			UCUNIT_CheckIsEqual(kt,buffer_read(testptr));//check if read after end of buffer is same as first value in buffer
+			buffer_write(testptr,6,testsize);
+			UCUNIT_CheckIsEqual(SUCCESS,testresult);//check if it can overlap and write
+			buffer_write(testptr,5,testsize);
+			buffer_write(testptr,6,testsize);
+			buffer_write(testptr,7,testsize);//buffer limit reached
+			buffer_write(testptr,8,testsize);
+			UCUNIT_CheckIsEqual(8,buffer_read(testptr));//buffer has failed
+			buffer_reset(testptr);
+			UCUNIT_Check(buffer_read(testptr)==FAILURE,"Buffer is empty so fail","Args is buffer pointer");
+			buffer_destroy(testptr);
+			UCUNIT_CheckIsNull(testptr->buffer);//if buffer is destroyed
+#endif
 
 
 	while(1)
 	{
-
+LED_PROCESS();
 #ifdef interrupt
 #ifdef app
 		receivewritetobuffer(t, space,l);
@@ -132,7 +172,7 @@ logapp();
 		{
 			//Send_String("Limit reached \n\r");
 
-
+			LED_FAIL();delay();LED_PASS();
 			character_counter(space,t);
 			generate_charreport();
 			buffer_reset(t);
@@ -154,7 +194,7 @@ logapp();
 		{
 			//Send_String("Limit reached \n\r");
 
-
+			LED_FAIL();delay();LED_PASS();
 			character_counter(space,t);
 			generate_charreport();
 			buffer_reset(t);
@@ -167,6 +207,7 @@ logapp();
 
 #endif
 #endif
+
 	}
 
 

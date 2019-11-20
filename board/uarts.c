@@ -76,6 +76,7 @@ void Send_Char_Poll(char k) {
 	//	while (*str != '\0') { // Send characters up to null terminator
 	//
 	//		UART0_Transmit_Poll(*str++);
+	LED_PASS();delay();delay();
 	while(UART0_Transmit_Poll()) //blocking here
 		;
 
@@ -263,7 +264,7 @@ void Send_String(char *str) {
 void echo()
 {
 	if(received)
-	{
+	{	LED_PASS();
 		Send_Char(received_char());
 		received=false;
 	}

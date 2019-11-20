@@ -16,6 +16,8 @@
 #ifdef ddebug
 #define logfunction() serialstringprint("Function running is ");serialstringprint(__func__);serialstringprint("\n\r")
 #define logmode() serialstringprint("Mode is Debug\n\r");
+#else
+#define logfunction()
 #endif
 
 #ifdef NORMAL
@@ -23,8 +25,10 @@
 #endif
 
 #ifdef TEST
-#define logwrite(x) printf("%s ",__func__);printf("x");
+#define logfunc() printf("%s ",__func__);printf("x");
 #define logmode() serialstringprint("Mode is Debug\n\r");
+#else
+#define logfunc()
 #endif
 #ifdef echo
 #define logapp() serialstringprint("Application running is echo\n\r")
