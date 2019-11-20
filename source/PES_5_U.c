@@ -79,7 +79,7 @@ for(int i=0;i<bufferlength;i++)
 {
 
 	charvalue=buffer_read(user_t);
-	characters[charvalue-32]+=1;
+	characters[charvalue-32]+=1; //USES ASCII VALUE AS INDEX WITH SOME OFFSET
 }
 }
 
@@ -92,13 +92,13 @@ void generate_charreport() //prints the character report by going through buffer
 		if(characters[i]!=0)
 		{
 			char test[40];
-			sprintf( test," %c - %d;\0",i+32,characters[i]);
+			sprintf( test," %c - %d;\0",i+32,characters[i]); //READS COUNT AND ALSO ACTUAL ASCII VALUE FROM INDEX
 			Send_String(test);
 			characters[i]=0;
 
 		}
 	}
-	log_time();
+	log_time();//TIME STAMP
 	serialstringprint("\n\r");
 }
 
